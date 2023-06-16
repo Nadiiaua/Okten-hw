@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post Details</title>
+    <style>
+        @font-face {
+            font-family: MonoLisa;
+            src: url(MonoLisa-LightItalic.ttf);
+        }
+        *{
+            font-family: MonoLisa;
+        }
+        .post-details {
+            width: 90%;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .post-details h1 {
+            margin-top: 0;
+        }
+        .post-details p {
+            margin: 5px 0;
+        }
+        .comment-block {
+            width: 23%;
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+
+        .comment-block h3 {
+            margin-top: 0;
+        }
+
+        .comment-block p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+     <div class="post-details">
+          <h1>Post Details</h1>
+          <div id="post-details"></div>
+          <div id="comment-list"></div>
+     </div>
+<script>
+    // На странице post-details.html:
+    // 7 Вивести всю, без виключення, інформацію про об'єкт post на який клікнули .
+    // 8 Нижчє інформаці про пост, вивести всі коментарі поточного поста
+    // (ендпоінт  - https://jsonplaceholder.typicode.com/posts/POST_ID/comments)
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('id');
+
+    fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`)
+      .then(response => response.json())
+      .then(post => {
+          const postDetails = document.getElementById('post-details');
+          postDetails.innerHTML = `
+                    <p>ID: ${post.id}</p>
+                    <p>Title: ${post.title}</p>
+                    <p>Body: ${post.body}</p>
+                `;
+      })
+        .catch(error => {
+            console.log('Error:', error);
+    });
+
+    fetch(`https://jsonplaceholder.typicode.com/posts/${postId}/comments`)
+       .then(response => response.json())
+       .then(comments => {
+           const commentList = document.getElementById('comment-list');
+           commentList.innerHTML = '';
+           comments.forEach(comment => {
+               const commentBlock = document.createElement('div');
+               commentBlock.className = 'comment-block';
+               const commentIdElement = document.createElement('h3');
+               commentIdElement.innerText = `ID: ${comment.id}`;
+               const commentName = document.createElement('p');
+               commentName.innerText = `Name: ${comment.name}`;
+               const commentEmail = document.createElement('p');
+               commentEmail.innerText = `Email: ${comment.email}`;
+               const commentBody = document.createElement('p');
+               commentBody.innerText = `Body: ${comment.body}`;
+
+               commentBlock.appendChild(commentIdElement);
+               commentBlock.appendChild(commentName);
+               commentBlock.appendChild(commentEmail);
+               commentBlock.appendChild(commentBody);
+               commentList.appendChild(commentBlock);
+           });
+       })
+    .catch(error => {
+        console.log(`Error`, error);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User List</title>
+  <style>
+      @font-face {
+          font-family: MonoLisa;
+          src: url(MonoLisa-LightItalic.ttf);
+      }
+      *{
+          font-family: MonoLisa;
+      }
+    .user-block{
+      display: inline-block;
+      width: 45%;
+      padding: 10px;
+      margin: 10px;
+      background-color: #f5f5f5;
+      border-radius: 5px;
+    }
+    .user-block h2 {
+      margin-top: 0;
+    }
+    .user-block .user-info {
+      margin-bottom: 10px;
+    }
+    .user-block .user-button {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<h1>User list</h1>
+<div id="user-list"></div>
+
+<script>
+  // В index.html
+  // 1 отримати масив об'єктів з endpoint`а https://jsonplaceholder.typicode.com/users
+  // 2 Вивести id,name всіх user в index.html. Окремий блок для кожного user.
+  // 3 Додати кожному блоку кнопку/посилання , при кліку на яку відбувається перехід  на сторінку user-details.html,
+  // котра має детальну інфорацію про об'єкт на який клікнули
+
+  fetch('https://jsonplaceholder.typicode.com/users')
+     .then(response => response.json())
+     .then(users => {
+       const userList = document.getElementById('user-list');
+       users.forEach(user => {
+         const userBlock = document.createElement('div');
+         userBlock.className = 'user-block';
+         const userInfo = document.createElement('div');
+         userInfo.className = 'user-info';
+         const userId = document.createElement('h2');
+         userId.innerHTML = `ID: ${user.id}`;
+         const userName = document.createElement('p');
+         userName.innerHTML = `Name: ${user.name}`;
+         userInfo.appendChild(userId);
+         userInfo.appendChild(userName);
+
+         const btn = document.createElement('button');
+         btn.innerHTML = `View Details`;
+         btn.onclick = () => {
+           window.location.href = `user-details.html?id=${user.id}`;
+         };
+         const userButtonContainer = document.createElement('div');
+         userButtonContainer.className = 'user-button';
+         userButtonContainer.appendChild(btn);
+
+         userBlock.appendChild(userInfo);
+         userBlock.appendChild(userButtonContainer);
+         userList.appendChild(userBlock);
+       });
+     })
+  .catch(error => console.log('Error',error));
+
+</script>
+</body>
+</html>

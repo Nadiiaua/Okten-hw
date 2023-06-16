@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Details</title>
+  <style>
+      @font-face {
+          font-family: MonoLisa;
+          src: url(MonoLisa-LightItalic.ttf);
+      }
+      *{
+          font-family: MonoLisa;
+      }
+    .user-details {
+      width: 90%;
+      margin: 0 auto;
+      background-color: #f5f5f5;
+      padding: 20px;
+      border-radius: 5px;
+    }
+    .user-details h1 {
+      margin-top: 0;
+    }
+    .user-details p {
+      margin: 5px 0 ;
+    }
+    .user-details button {
+        text-align: center;
+        width: 90%;
+        margin: 20px auto;
+        display: block
+    }
+    .post-block {
+        width: 20%;
+        display: inline-block;
+        margin: 10px;
+        padding: 10px;
+        background-color: #f5f5f5;
+        border-radius: 5px;
+    }
+    .post-block h3 {
+        margin-top: 0;
+    }
+    .post-block p {
+        margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+    <div class="user-details">
+        <h1>User Details</h1>
+        <div id="user-details"></div>
+        <button id="post-button">Posts of Current User</button>
+        <div id="post-list"></div>
+    </div>
+<script>
+  // На странице user-details.html:
+  // 4. Вивести всю, без виключення, інформацію про об'єкт user на який клікнули
+  // 5. Додати кнопку "post of current user", при кліку на яку, з'являються title всіх постів поточного юзера
+  // (для получения постов используйте эндпоинт https://jsonplaceholder.typicode.com/users/USER_ID/posts)
+  // 6 .Каждому посту додати кнопку/посилання, при кліку на яку відбувається перехід на сторінку post-details.html,
+  // котра має детальну інфу про поточний пост.
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const userId = urlParams.get('id');
+
+  fetch(`https://jsonplaceholder.typicode.com/users/${userId}`)
+          .then(response => response.json())
+          .then(user => {
+            const userDetails = document.getElementById('user-details');
+              userDetails.innerHTML = `
+                    <p>ID: ${user.id}</p>
+                    <p>Name: ${user.name}</p>
+                    <p>Email: ${user.email}</p>
+                    <p>Phone: ${user.phone}</p>
+                    <p>Website: ${user.website}</p>
+                    <p>Address: ${user.address.street}<br>${user.address.suite}<br>${user.address.zipcode}<br>${user.address.geo.lat}<br>${user.address.geo.lng}</p>
+                    <p>Company: ${user.company.name}<br>${user.company.catchPhrase}<br>${user.company.bs}</p>
+                `;
+          })
+          .catch(error =>{
+            console.log('Error', error);
+          });
+  const postButton = document.getElementById('post-button');
+  postButton.addEventListener('click',() =>{
+      fetch(`https://jsonplaceholder.typicode.com/users/${userId}/posts`)
+          .then(response => response.json())
+          .then(posts => {
+              const postList = document.getElementById('post-list');
+              postList.innerHTML = '';
+            posts.forEach(post =>{
+                const postBlock = document.createElement('div');
+                postBlock.className = 'post-block';
+
+                const postIdElement = document.createElement('h3');
+                postIdElement.innerText = `ID: ${post.id}`;
+
+                const postTitle = document.createElement('p');
+                postTitle.innerText = `Title: ${post.title}`;
+
+                const postButton = document.createElement('button');
+                postButton.innerText = 'View Details';
+                postButton.addEventListener('click', () => {
+                    window.location.href = `post-details.html?id=${post.id}`;
+                });
+             postBlock.appendChild(postIdElement);
+             postBlock.appendChild(postTitle);
+             postBlock.appendChild(postButton);
+             postList.appendChild(postBlock);
+            });
+          })
+          .catch(error => {
+              console.log('Error', error);
+          });
+  });
+
+</script>
+</body>
+</html>
